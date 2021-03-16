@@ -19,6 +19,12 @@ const P5Sketch = () => {
 
         p.canvasHeight = window.innerHeight;
 
+        p.song = null;
+
+        p.tempo = 122;
+
+        p.barAsSeconds = Math.floor((60 / p.tempo) * 4 * 100000) / 100000;
+
         p.fireworks = [];
         
         p.gravity = 0;
@@ -46,14 +52,17 @@ const P5Sketch = () => {
             }
 
             for (let i = 0; i < cueSet2.length; i++) {
-              p.song.addCue(cueSet2[i].time, p.executeCueSet2, i + 1);
+              let vars = {
+                currentCue: i + 1,
+                time: cueSet2[i].time,
+              };
+              p.song.addCue(cueSet2[i].time, p.executeCueSet2, vars);
             }
 
         };
 
         p.draw = () => {
-            p.colorMode(p.RGB);
-            p.background(0, 0, 0, 25);
+            p.background(0, 0, 0, 0.1);
             
             for (let i = p.fireworks.length - 1; i >= 0; i--) {
                 p.fireworks[i].update(p.gravity);
@@ -72,10 +81,20 @@ const P5Sketch = () => {
            }
          };
 
-         p.executeCueSet2 = (currentCue) => {
-           if (!p.cueSet2Completed.includes(currentCue)) {
-             p.cueSet2Completed.push(currentCue);
-             p.fireworks.push(new Firework(p, "point"));
+         p.executeCueSet2 = (vars) => {
+           if (!p.cueSet2Completed.includes(vars.currentCue)) {
+             p.cueSet2Completed.push(vars.currentCue);
+             let xPos = Math.floor(vars.time * 100000) / 100000 / 2;
+             if (parseFloat(xPos) >= parseFloat(p.barAsSeconds)) {
+               while (xPos >= p.barAsSeconds) {
+                 xPos = xPos - p.barAsSeconds;
+               }
+
+               xPos = xPos > 0 ? xPos : 0;
+             }
+
+             let x = p.width / 32 + (p.width / p.barAsSeconds) * xPos;
+             p.fireworks.push(new Firework(p, "point", x));
            }
          };
 

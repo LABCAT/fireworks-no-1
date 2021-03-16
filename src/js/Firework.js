@@ -1,13 +1,14 @@
 import Particle from "./Particle.js";
 
 export default class Firework {
-  constructor(p, type) {
+  constructor(p, type, xPos = 0) {
     this.p5 = p;
     this.type = type;
+    this.xPos = xPos > 0 ? xPos : this.p5.random(this.p5.width);
     this.hue = this.p5.random(255);
     this.firework = new Particle(
       this.p5,
-      this.p5.random(this.p5.width),
+      this.xPos,
       this.p5.height,
       this.hue,
       true,

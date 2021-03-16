@@ -13,13 +13,18 @@ export default class Particle {
         if (this.type === "point") {
           rand = this.p5.random(-12, -8);
         } else {
-          rand = this.p5.random(-20, -15);
+          rand = this.p5.random(-18, -15);
         }
       this.vel = this.p5.createVector(0, rand);
     } else {
       this.vel = window.p5.Vector.random2D();
       //how far does this explosion spread?
-      this.vel.mult(this.p5.random(2, 40));
+      if (this.type === "point") {
+        this.vel.mult(this.p5.random(2, 15));
+      }
+      else {
+        this.vel.mult(this.p5.random(2, 60));
+      }
     }
   }
 
@@ -61,18 +66,20 @@ export default class Particle {
     }
 
     if (this.type === "point") {
-        this.p5.point(this.pos.x, this.pos.y);
+      this.p5.point(this.pos.x, this.pos.y);
+    } else if (this.type === "ellipse") {
+      this.p5.ellipse(this.pos.x, this.pos.y, weight * 2);
     }
     else {
-        this.p5.ellipse(this.pos.x, this.pos.y, weight * 2);
+      this.p5.triangle(
+        this.pos.x,
+        this.pos.y,
+        this.pos.x + 8,
+        this.pos.y,
+        this.pos.x + 4,
+        this.pos.y - 8,
+      );
     }
-    // this.p5.triangle(
-    //   this.pos.x,
-    //   this.pos.y,
-    //   this.pos.x + 8,
-    //   this.pos.y,
-    //   this.pos.x + 4,
-    //   this.pos.y - 8,
-    // );
+    
   }
 }
