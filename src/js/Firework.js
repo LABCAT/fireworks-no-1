@@ -1,18 +1,19 @@
 import Particle from "./Particle.js";
 
 export default class Firework {
-  constructor(p, type, xPos = 0) {
+  constructor(p, type, xPos = 0, hue = 0, rand = 0) {
     this.p5 = p;
     this.type = type;
     this.xPos = xPos > 0 ? xPos : this.p5.random(this.p5.width);
-    this.hue = this.p5.random(255);
+    this.hue = hue > 0 ? hue : this.p5.random(255);
     this.firework = new Particle(
       this.p5,
       this.xPos,
       this.p5.height,
       this.hue,
       true,
-      this.type
+      this.type,
+      rand
     );
     this.exploded = false;
     this.particles = [];
@@ -33,10 +34,12 @@ export default class Firework {
 
       if (this.firework.vel.y >= 0) {
         this.exploded = true;
-        this.explode();
+        if (this.type !== "point") {
+          this.explode();
+        }
       }
     }
-
+    
     for (let i = this.particles.length - 1; i >= 0; i--) {
       this.particles[i].applyForce(gravity);
       this.particles[i].update();

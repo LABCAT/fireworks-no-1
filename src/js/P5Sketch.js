@@ -6,6 +6,7 @@ import Firework from "./Firework.js";
 import audio from "../audio/fireworks-no-1.ogg";
 import cueSet1 from "./cueSet1.js";
 import cueSet2 from "./cueSet2.js";
+import cueSet3 from "./cueSet3.js";
 
 
 const P5Sketch = () => {
@@ -33,6 +34,8 @@ const P5Sketch = () => {
 
         p.cueSet2Completed = [];
 
+        p.cueSet3Completed = [];
+
         p.preload = () => {
           p.song = p.loadSound(audio);
         };
@@ -55,10 +58,14 @@ const P5Sketch = () => {
               let vars = {
                 currentCue: i + 1,
                 time: cueSet2[i].time,
+                midi: cueSet2[i].midi,
               };
               p.song.addCue(cueSet2[i].time, p.executeCueSet2, vars);
             }
 
+            for (let i = 0; i < cueSet3.length; i++) {
+              p.song.addCue(cueSet3[i].time, p.executeCueSet3, i + 1);
+            }
         };
 
         p.draw = () => {
@@ -77,7 +84,7 @@ const P5Sketch = () => {
          p.executeCueSet1 = (currentCue) => {
            if (!p.cueSet1Completed.includes(currentCue)) {
              p.cueSet1Completed.push(currentCue);
-             p.fireworks.push(new Firework(p, 'circle'));
+             p.fireworks.push(new Firework(p, 'triangle'));
            }
          };
 
@@ -85,18 +92,39 @@ const P5Sketch = () => {
            if (!p.cueSet2Completed.includes(vars.currentCue)) {
              p.cueSet2Completed.push(vars.currentCue);
              let xPos = Math.floor(vars.time * 100000) / 100000 / 2;
+             console.log(p.barAsSeconds);
              if (parseFloat(xPos) >= parseFloat(p.barAsSeconds)) {
                while (xPos >= p.barAsSeconds) {
                  xPos = xPos - p.barAsSeconds;
                }
-
                xPos = xPos > 0 ? xPos : 0;
              }
 
+             let hue = 0;
+             let rand = 0;
+             switch (vars.midi) {
+               case 36:
+                 hue = p.random(90, 269);
+                 rand = p.random(-8, -4);
+                 break;
+               case 37:
+                 hue = p.random(270, 449);
+                 hue = hue <= 360 ? hue : (hue = hue - 360); 
+                 rand = p.random(-20, -16);
+                 break;
+             } 
+
              let x = p.width / 32 + (p.width / p.barAsSeconds) * xPos;
-             p.fireworks.push(new Firework(p, "point", x));
+             p.fireworks.push(new Firework(p, "point", x, hue, rand));
            }
          };
+
+        p.executeCueSet3 = (currentCue) => {
+          if (!p.cueSet3Completed.includes(currentCue)) {
+            p.cueSet3Completed.push(currentCue);
+            p.fireworks.push(new Firework(p, "circle"));
+          }
+        };
 
         p.mousePressed = () => {
           if (p.song.isPlaying()) {
