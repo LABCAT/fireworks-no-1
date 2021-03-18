@@ -1,27 +1,32 @@
 
 export default class Particle {
-  constructor(p, x, y, hue, firework, type, rand =0) {
+  constructor(p, x, y, hue, firework, type, spread = 0, vel = 0) {
     this.p5 = p;
     this.pos = this.p5.createVector(x, y);
     this.firework = firework;
     this.hue = hue;
     this.type = type;
+    this.startTime = this.p5.millis();
     this.lifespan = this.type === "circle" ? 1023 : 255;
     this.acc = this.p5.createVector(0, 0);
     if (this.firework) {
-      if(rand >= 0){
-          if (this.type === "point") {
-            rand = this.p5.random(-12, -8);
-          } else {
-            rand = this.p5.random(-18, -15);
-          }
+      if (vel >= 0) {
+        if (this.type === "point") {
+          vel = this.p5.random(-12, -8);
+        } else {
+          vel = this.p5.random(-18, -15);
+        }
       }
-      this.vel = this.p5.createVector(0, rand);
+      this.vel = this.p5.createVector(0, vel);
     } else {
       this.vel = window.p5.Vector.random2D();
       //how far does this explosion spread?
-      if (this.type === "point") {
-        this.vel.mult(this.p5.random(2, 15));
+      console.log(spread);
+      if (spread > 0) {
+        this.vel.mult(spread);
+      }
+      else if (this.type === "point") {
+        this.vel.mult(this.p5.random(2, 10));
       }
       else if (this.type === "triangle") {
         this.vel.mult(this.p5.random(2, 30));
@@ -46,7 +51,8 @@ export default class Particle {
   }
 
   done() {
-    if (this.lifespan < 0) {
+    const oneBarAfterStart = this.startTime + 1967;
+    if (this.p5.millis() >= oneBarAfterStart) {
       return true;
     } else {
       return false;
@@ -70,11 +76,13 @@ export default class Particle {
     if (this.type === "point") {
       this.p5.point(this.pos.x, this.pos.y);
     } else if (this.type === "circle") {
+      this.p5.noFill();
       this.p5.stroke(this.hue, 255, 255, 0.5);
-      this.p5.fill(fillHue, 255, 255, 0.5);
-      this.p5.ellipse(this.pos.x, this.pos.y, weight * 2);
       this.p5.ellipse(this.pos.x, this.pos.y, weight * 4);
+      this.p5.stroke(fillHue, 255, 255, 0.5);
       this.p5.ellipse(this.pos.x, this.pos.y, weight * 8);
+      this.p5.stroke(this.hue, 255, 255, 0.5);
+      this.p5.ellipse(this.pos.x, this.pos.y, weight * 16);
     }
     else {
       this.p5.triangle(
