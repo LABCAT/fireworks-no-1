@@ -81,15 +81,17 @@ const P5Sketch = () => {
         };
 
         p.draw = () => {
-            p.background(0, 0, 0, 0.1);
-            
-            for (let i = p.fireworks.length - 1; i >= 0; i--) {
-                p.fireworks[i].update(p.gravity);
-                p.fireworks[i].show();
-                
-                if (p.fireworks[i].done()) {
-                    p.fireworks.splice(i, 1);
-                }
+            if (p.song && p.song.isPlaying()) {
+              p.background(0, 0, 0, 0.1);
+              
+              for (let i = p.fireworks.length - 1; i >= 0; i--) {
+                  p.fireworks[i].update(p.gravity);
+                  p.fireworks[i].show();
+                  
+                  if (p.fireworks[i].done()) {
+                      p.fireworks.splice(i, 1);
+                  }
+              }
             }
         };
 
